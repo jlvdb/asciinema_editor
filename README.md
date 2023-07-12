@@ -22,4 +22,12 @@ There is an example in the ``examples/`` directory which covers most of the func
     cd examples
     python create_yaw_cast.py
 
+The example should look similar to this:
+![example output as GIF](examples/yaw_cli_small.gif)
+
+
+## Conversion to GIF
+
 One way to convert the recording to a gif is using the online tool [``gifcast``](https://dstein64.github.io/gifcast/). Upload the ``.cast`` file, configure the conversion and download the gif.
+
+A good tool for compression is ``gifsicle``.
