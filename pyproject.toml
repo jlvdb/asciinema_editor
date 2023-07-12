@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asciinema_editor"
+dynamic = ["version"]
+authors = [
+    {name = "Jan Luca van den Busch", email = "jlvdb@astro.ruhr-uni-bochum.de"},
+]
+description = "Edit terminal output recordings captured with ASCIINEMA."
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+    "Topic :: Terminals",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "flake8",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "asciinema_editor.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+include = ".pyi?$"
+exclude = """
+/(
+    .git
+    | .hg
+    | .mypy_cache
+    | .tox
+    | .venv
+    | _build
+    | buck-out
+    | build
+    | dist
+)/
+"""
