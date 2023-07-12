@@ -159,12 +159,15 @@ class Recording(Sequence):
     def __getitem__(self, item) -> Record:
         return self.records[item]
 
-    def __radd__(self, recording: Recording) -> Recording:
+    def __iadd__(self, recording: Recording) -> Recording:
         self.append(recording)
+        return self
 
     @property
     def end(self) -> float:
         """The end time of the Recording, relative to an absolute time=0.0."""
+        if len(self) == 0:
+            return 0.0
         return self.records[-1].time
 
     @property

@@ -25,6 +25,7 @@ dev = [
     "black",
     "isort",
     "flake8",
+    "asciinema",
 ]
 
 [tool.setuptools.dynamic]
