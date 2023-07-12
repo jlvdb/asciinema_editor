@@ -9,20 +9,34 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Iterator
 
-
-__all__ = ["Colors", "Record", "Recording", "generate_prompt", "wait", "end", "type_text"]
+__all__ = [
+    "Colors",
+    "Record",
+    "Recording",
+    "generate_prompt",
+    "wait",
+    "end",
+    "type_text",
+]
 
 
 class Colors:
     """Short hands for ASCII sequences to set colours"""
-    sep = "|"
+
     gry = "\033[2m"
+    """faint."""
     bld = "\033[1m"
+    """Bold."""
     blu = "\033[1;34m"
+    """Blue, bold."""
     grn = "\033[1;32m"
+    """Green, bold."""
     ylw = "\033[1;33m"
+    """Yellow, bold."""
     red = "\033[1;31m"
+    """Red, bold."""
     rst = "\033[0m"
+    """Reset to default."""
 
 
 sub_rules = {"\n": "\\n", "\r": "\\r", "\t": "\\t", "\u001b": "\\u001b"}
@@ -152,7 +166,7 @@ class Recording(Sequence):
     def end(self) -> float:
         """The end time of the Recording, relative to an absolute time=0.0."""
         return self.records[-1].time
-    
+
     @property
     def duration(self) -> float:
         """The duration of the Recording"""
@@ -161,8 +175,9 @@ class Recording(Sequence):
     def copy(self) -> Recording:
         """Create a copy of the instance"""
         new = Recording(
-            copy.copy(self.header), [rec.copy() for rec in self.records],
-            start=self.start
+            copy.copy(self.header),
+            [rec.copy() for rec in self.records],
+            start=self.start,
         )
         return new
 
@@ -184,8 +199,7 @@ class Recording(Sequence):
             record.time += offset
 
     def trim(self) -> None:
-        """Remove any time offset, i.e. display the first Record with no delay.
-        """
+        """Remove any time offset, i.e. display the first Record with no delay."""
         self.apply_offset(-self.start)
 
     def split_before(self, record_index: int) -> tuple[Recording, Recording]:
@@ -237,8 +251,14 @@ class Recording(Sequence):
 
 
 def generate_prompt(
-    user: str, machine: str, *, dir: str = "~", prompt: str = " $ ",
-    env: str | None = None, c1: str = Colors.red, c2: str = Colors.blu,
+    user: str,
+    machine: str,
+    *,
+    dir: str = "~",
+    prompt: str = " $ ",
+    env: str | None = None,
+    c1: str = Colors.red,
+    c2: str = Colors.blu,
     duration: float = 0.0,
 ) -> Recording:
     """Generate a commandline prompt '(env) user@machine [dir][prompt]', with
@@ -263,7 +283,7 @@ def end(wait) -> Recording:
 
 def type_text(text: str, speed: float = 0.04, term: str = "o") -> Recording:
     """Type a sequence of characters at the given speed"""
-    variance = 0.3*speed
+    variance = 0.3 * speed
     time_cul = 0.0
     records = []
     for char in text:
