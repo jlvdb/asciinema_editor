@@ -4,9 +4,9 @@ import copy
 import json
 import random
 import sys
-import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from time import sleep
 from typing import Iterator
 
 __all__ = [
@@ -39,10 +39,6 @@ class Colors:
     """Reset to default."""
 
 
-sub_rules = {"\n": "\\n", "\r": "\\r", "\t": "\\t", "\u001b": "\\u001b"}
-"""Substitution rules for ASCII special characters. Use JSON load instead?"""
-
-
 @dataclass
 class Record:
     """A single record (line) of a asciinema .cast file. Holds the time stamp,
@@ -62,24 +58,12 @@ class Record:
     @classmethod
     def from_line(cls, line: str) -> Record:
         """Build an instance from a line of a .cast file."""
-        # parse the data
-        content = line[1:-2]
-        time_stamp, term, text = content.split(", ", 2)
-        # parse the text
-        text = text[1:-1]
-        for _to, _from in sub_rules.items():
-            text = text.replace(_from, _to)
-        # compute the time delta
-        t = float(time_stamp)
-        return cls(t, text, terminal=term.strip('"'))
+        time, terminal, text = json.loads(line)
+        return cls(time, text, terminal)
 
     def to_line(self) -> str:
-        """Build a string that can be written to a .cast file, includes a
-        trailing new line character."""
-        text = self.text
-        for _from, _to in sub_rules.items():
-            text = text.replace(_from, _to)
-        return f'[{self.time:.6f}, "{self.terminal}", "{text}"]\n'
+        """Build a string that can be written to a .cast file."""
+        return json.dumps([self.time, self.terminal, self.text])
 
     def copy(self) -> Record:
         """Make a copy of the instance"""
@@ -219,6 +203,11 @@ class Recording(Sequence):
         recording.apply_offset(self.end)
         self.records.extend(recording.records)
 
+    def modify_speed(self, speed: float) -> None:
+        """Scale the playback speed by this factor."""
+        for record in self.records:
+            record.time = record.time / speed
+
     def format(self) -> str:
         """Render the recording instantly into a single string."""
         string = ""
@@ -233,7 +222,7 @@ class Recording(Sequence):
             t_last = 0.0
             for record in self.records:
                 t_delta = record.time - t_last
-                time.sleep(t_delta / speed)
+                sleep(t_delta / speed)
                 if record.terminal == "o":
                     _file = sys.stdout
                 else:
@@ -250,7 +239,7 @@ class Recording(Sequence):
         with open(path, "w") as f:
             f.write(json.dumps(self.header) + "\n")
             for record in self.records:
-                f.write(record.to_line())
+                f.write(record.to_line() + "\n")
 
 
 def generate_prompt(

@@ -20,12 +20,13 @@ if __name__ == "__main__":
 
     # create the new cast
     movie = ascii.Recording.empty_from(cast)
+    movie.header["height"] = 24
     # start with the prompt and wait 6 seconds
     movie += prompt
-    movie += ascii.wait(6)
+    movie += ascii.wait(2)
     # type in the command and wait 2 seconds, then "press enter"
     movie += ascii.type_text("yaw_cli run -vv test_run -s test_setup.yaml --progress")
-    movie += ascii.wait(2)
+    movie += ascii.wait(3)
     movie += ascii.type_text("\n\r")  # press enter
     # replay the command output from the cast
     movie += cast
@@ -33,6 +34,9 @@ if __name__ == "__main__":
     movie += prompt
     movie += ascii.end(10)
 
-    # write the new cast and replay it afterwards at 3x speed
+    # speed up the cast by 2x
+    movie.modify_speed(2)
+
+    # write the new cast and replay it afterwards
     movie.write("yaw_cli.cast")
-    movie.replay(3)
+    movie.replay(2)  # play faster
